@@ -72,10 +72,15 @@ func readCSV() Wastes {
 
 func csvMap() string {
 	rubbish := "map[string]string{"
+	var uniqueMap = make(map[string]bool)
 	for index, line := range readCSV() {
 		if index == 0 {
 			continue
 		}
+		if uniqueMap[line.Name] {
+			continue
+		}
+		uniqueMap[line.Name] = true
 		rubbish += fmt.Sprintf(`"%s": "%s",`, strings.TrimSpace(line.Name), strings.TrimSpace(line.Class)) + "\n"
 	}
 	rubbish += "}"
@@ -85,7 +90,7 @@ func csvMap() string {
 
 func write() {
 	dir := "./waste/waste.go"
-	if _, fErr := os.Stat(dir); !os.IsExist(fErr) {
+	if _, fErr := os.Stat(dir); os.IsExist(fErr) {
 		err := os.Mkdir("waste", os.ModePerm)
 		if err != nil {
 			log.Fatalln(err)
